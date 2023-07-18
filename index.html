@@ -52,7 +52,7 @@
 
       const inputHTML = document.getElementById('input-html').value;
 
-      const exceptionTags = ['strong', 'p','a', 'ul', 'ol', 'li'];
+      const exceptionTags = ['strong', 'b', 'em', 'i', 'p','a', 'ul', 'ol', 'li'];
       const customTagsInput = document.getElementById('custom-tags');
       const customTags = customTagsInput.value.split(',').map((tag) => tag.trim());
       exceptionTags.push(...customTags);
