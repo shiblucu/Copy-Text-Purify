@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HTML Code Processing</title>
+  <style>
+    #input-html,
+    #output-html,
+    #output-rendered {
+      width: 80%;
+      height: 250px;
+    }
+
+    #output-container {
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+  <script>
+    function removeTagsAndInlineStyles(html, exceptionTags) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+
+      const elementsToRemove = div.querySelectorAll('*');
+
+      elementsToRemove.forEach((element) => {
+        const tagName = element.tagName.toLowerCase();
+        if (!exceptionTags.includes(tagName)) {
+          while (element.firstChild) {
+            element.parentNode.insertBefore(element.firstChild, element);
+          }
+          element.parentNode.removeChild(element);
+        }
+      });
+
+      const elementsWithStyles = div.querySelectorAll('[style]');
+      elementsWithStyles.forEach((element) => {
+        element.removeAttribute('style');
+      });
+
+      let output = div.innerHTML;
+
+      output = output.replace(/&nbsp;/g, '');
+      output = output.replace(/<p><\/p>/g, '');
+
+      output = output.replace(/<\/p>/g, '</p>\n');
+
+      return output;
+    }
+
+    function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const inputHTML = document.getElementById('input-html').value;
+
+      const exceptionTags = ['strong', 'p','a', 'ul', 'ol', 'li'];
+      const customTagsInput = document.getElementById('custom-tags');
+      const customTags = customTagsInput.value.split(',').map((tag) => tag.trim());
+      exceptionTags.push(...customTags);
+
+      const outputHTML = removeTagsAndInlineStyles(inputHTML, exceptionTags);
+
+      document.getElementById('output-html').value = outputHTML;
+      document.getElementById('output-rendered').innerHTML = outputHTML;
+    }
+
+    function handleCopyButton() {
+      const outputHTML = document.getElementById('output-html').value;
+      navigator.clipboard.writeText(outputHTML).then(() => {
+        alert('HTML code copied!');
+      }, () => {
+        alert('Failed to copy HTML code!');
+      });
+    }
+  </script>
+</head>
+<body>
+  <h1>HTML Code Processing</h1>
+
+  <form onsubmit="handleFormSubmit(event)">
+    <label for="input-html">Input HTML:</label><br>
+    <textarea id="input-html" rows="10" cols="50"></textarea><br><br>
+
+    <label for="custom-tags">Custom Tags:</label>
+    <input type="text" id="custom-tags" placeholder="Add custom tags"><br><br>
+
+    <input type="submit" value="Process HTML">
+  </form>
+
+  <h2>Output:</h2>
+  <div id="output-container">
+    <textarea id="output-html" rows="10" cols="50" readonly></textarea>
+    <div id="output-rendered"></div>
+  </div>
+  
+  <button onclick="handleCopyButton()">Copy</button>
+</body>
+</html>
