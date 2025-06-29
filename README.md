@@ -16,7 +16,7 @@ Ideal for web developers, WordPress users, or content editors who work with HTML
 
 You can use this tool directly in your browser via GitHub Pages:
 
-**[Use HTML Code Cleaner in your browser](https://shiblucu.github.io/html-code-cleaner/)**
+**[Use HTML Code Cleaner in your browser](https://shiblucu.github.io/HTML-Code-Cleaner/)**
 
 
 Steps:
