@@ -6,27 +6,32 @@ Ideal for web developers, WordPress users, or content editors who work with HTML
 
 ## Features
 
-- Remove all `<div>` tags while preserving their inner content
-- Strip `class`, `id`, and `style` attributes from all elements
-- Replace any HTML tag (e.g., `h2` → `h3`) using dropdowns
-- Automatically format and indent cleaned HTML
-- One-click button to copy the cleaned output to your clipboard
+- Remove all `<div>` tags while preserving their inner content.
+- Strip `class`, `id`, and `style` attributes from all elements.
+- Replace any HTML tag (e.g., `h2` → `h3`) using dropdowns.
+- Automatically format and indent cleaned HTML.
+- One-click button to copy the cleaned output to your clipboard.
 
 ## Usage
 
+You can use this tool directly in your browser via GitHub Pages:
+
+**[Use HTML Code Cleaner in your browser](https://shiblucu.github.io/html-code-cleaner/)**
+
+
+Steps:
+
 1. Paste your raw or unclean HTML into the input box.
 2. Select the tag you want to replace (e.g., `h2`) and the tag to replace it with (e.g., `h3`).
-3. Click the "Clean + Replace" button.
+3. Click the **Clean + Replace** button.
 4. The cleaned HTML will appear in the output box.
-5. Click "Copy to Clipboard" to quickly copy the cleaned code.
+5. Click **Copy to Clipboard** to copy the cleaned code.
 
 ## Development
 
 To run HTML Code Cleaner locally:
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/your-username/html-code-cleaner.git
+`git clone https://github.com/your-username/html-code-cleaner.git`
 
 Then open the index.html file in any modern web browser.
 
