@@ -1,97 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>HTML Code Processing</title>
+  <meta charset="UTF-8" />
+  <title>HTML Cleaner & Tag Replacer</title>
   <style>
-    #input-html,
-    #output-html,
-    #output-rendered {
-      width: 80%;
-      height: 250px;
-    }
-
-    #output-container {
-      display: flex;
-      justify-content: space-between;
-    }
+    body { font-family: sans-serif; padding: 2rem; background: #f0f0f0; }
+    textarea { width: 100%; height: 200px; margin-bottom: 1rem; font-family: monospace; }
+    select, button { padding: 8px 12px; margin-right: 10px; }
+    label { font-weight: bold; margin-right: 5px; }
+    .controls { margin-bottom: 1rem; }
   </style>
-  <script>
-    function removeTagsAndInlineStyles(html, exceptionTags) {
-      const div = document.createElement('div');
-      div.innerHTML = html;
-
-      const elementsToRemove = div.querySelectorAll('*');
-
-      elementsToRemove.forEach((element) => {
-        const tagName = element.tagName.toLowerCase();
-        if (!exceptionTags.includes(tagName)) {
-          while (element.firstChild) {
-            element.parentNode.insertBefore(element.firstChild, element);
-          }
-          element.parentNode.removeChild(element);
-        }
-      });
-
-      const elementsWithStyles = div.querySelectorAll('[style]');
-      elementsWithStyles.forEach((element) => {
-        element.removeAttribute('style');
-      });
-
-      let output = div.innerHTML;
-
-      output = output.replace(/&nbsp;/g, '');
-      output = output.replace(/<p><\/p>/g, '');
-
-      output = output.replace(/<\/p>/g, '</p>\n');
-
-      return output;
-    }
-
-    function handleFormSubmit(event) {
-      event.preventDefault();
-
-      const inputHTML = document.getElementById('input-html').value;
-
-      const exceptionTags = ['strong', 'b', 'em', 'i', 'p','a', 'ul', 'ol', 'li'];
-      const customTagsInput = document.getElementById('custom-tags');
-      const customTags = customTagsInput.value.split(',').map((tag) => tag.trim());
-      exceptionTags.push(...customTags);
-
-      const outputHTML = removeTagsAndInlineStyles(inputHTML, exceptionTags);
-
-      document.getElementById('output-html').value = outputHTML;
-      document.getElementById('output-rendered').innerHTML = outputHTML;
-    }
-
-    function handleCopyButton() {
-      const outputHTML = document.getElementById('output-html').value;
-      navigator.clipboard.writeText(outputHTML).then(() => {
-        alert('HTML code copied!');
-      }, () => {
-        alert('Failed to copy HTML code!');
-      });
-    }
-  </script>
 </head>
 <body>
-  <h1>HTML Code Processing</h1>
+  <h2>Paste Raw HTML:</h2>
+  <textarea id="input"></textarea>
 
-  <form onsubmit="handleFormSubmit(event)">
-    <label for="input-html">Input HTML:</label><br>
-    <textarea id="input-html" rows="10" cols="50"></textarea><br><br>
+  <div class="controls">
+    <label for="fromTag">Replace tag:</label>
+    <select id="fromTag">
+      <option disabled selected>-- select --</option>
+    </select>
 
-    <label for="custom-tags">Custom Tags:</label>
-    <input type="text" id="custom-tags" placeholder="Add custom tags"><br><br>
+    <label for="toTag">With:</label>
+    <select id="toTag">
+      <option value="h1">h1</option>
+      <option value="h2">h2</option>
+      <option value="h3" selected>h3</option>
+      <option value="h4">h4</option>
+      <option value="p">p</option>
+      <option value="div">div</option>
+      <option value="span">span</option>
+      <option value="section">section</option>
+      <option value="article">article</option>
+    </select>
 
-    <input type="submit" value="Process HTML">
-  </form>
-
-  <h2>Output:</h2>
-  <div id="output-container">
-    <textarea id="output-html" rows="10" cols="50" readonly></textarea>
-    <div id="output-rendered"></div>
+    <button onclick="cleanAndReplace()">Clean + Replace</button>
   </div>
-  
-  <button onclick="handleCopyButton()">Copy</button>
+
+  <h2>Cleaned Output:</h2>
+  <textarea id="output" readonly></textarea>
+  <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+
+  <script>
+    document.getElementById("input").addEventListener("input", function () {
+      const rawHTML = this.value;
+      const temp = document.createElement("div");
+      temp.innerHTML = rawHTML;
+
+      const tagSet = new Set();
+      temp.querySelectorAll("*").forEach(el => {
+        tagSet.add(el.tagName.toLowerCase());
+      });
+
+      const fromTag = document.getElementById("fromTag");
+      fromTag.innerHTML = '<option disabled selected>-- select --</option>';
+      [...tagSet].sort().forEach(tag => {
+        const opt = document.createElement("option");
+        opt.value = tag;
+        opt.textContent = tag;
+        fromTag.appendChild(opt);
+      });
+    });
+
+    function cleanAndReplace() {
+      const inputHTML = document.getElementById("input").value;
+      const fromTag = document.getElementById("fromTag").value;
+      const toTag = document.getElementById("toTag").value;
+
+      if (!fromTag || !toTag) {
+        alert("Please select both tags");
+        return;
+      }
+
+      const container = document.createElement("div");
+      container.innerHTML = inputHTML;
+
+      container.querySelectorAll(fromTag).forEach(el => {
+        const newEl = document.createElement(toTag);
+        newEl.innerHTML = el.innerHTML;
+        el.replaceWith(newEl);
+      });
+
+      container.querySelectorAll("div").forEach(div => {
+        const parent = div.parentNode;
+        while (div.firstChild) {
+          parent.insertBefore(div.firstChild, div);
+        }
+        parent.removeChild(div);
+      });
+
+      container.querySelectorAll("*").forEach(el => {
+        el.removeAttribute("class");
+        el.removeAttribute("id");
+        el.removeAttribute("style");
+      });
+
+      const cleanedHTML = formatHTML(container.innerHTML.trim());
+      document.getElementById("output").value = cleanedHTML;
+    }
+
+    function formatHTML(html) {
+      const lines = html
+        .replace(/>\s+</g, '>\n<')
+        .replace(/\n\s*\n/g, '\n')
+        .split('\n');
+
+      let formatted = '';
+      let indent = 0;
+      const indentChar = '  ';
+
+      lines.forEach(line => {
+        const trimmed = line.trim();
+
+        if (trimmed.match(/^<\/\w/)) indent--;
+        formatted += indentChar.repeat(indent) + trimmed + '\n';
+        if (trimmed.match(/^<\w[^>]*[^/]>/) && !trimmed.includes('</')) indent++;
+      });
+
+      return formatted.trim();
+    }
+
+    function copyToClipboard() {
+      const output = document.getElementById("output");
+      output.select();
+      document.execCommand("copy");
+
+      alert("✅ Cleaned HTML copied to clipboard!");
+    }
+  </script>
 </body>
 </html>
