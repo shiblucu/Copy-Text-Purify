@@ -2,30 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>HTML Code Cleaner</title>
+  <title>HTML Cleaner & Tag Replacer</title>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 2rem;
-      background: #f0f0f0;
-    }
-    textarea {
-      width: 100%;
-      height: 200px;
-      margin-bottom: 1rem;
-      font-family: monospace;
-    }
-    select, button {
-      padding: 8px 12px;
-      margin-right: 10px;
-    }
-    label {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-    .controls {
-      margin-bottom: 1rem;
-    }
+    body { font-family: sans-serif; padding: 2rem; background: #f0f0f0; }
+    textarea { width: 100%; height: 200px; margin-bottom: 1rem; font-family: monospace; }
+    select, button { padding: 8px 12px; margin-right: 10px; }
+    label { font-weight: bold; margin-right: 5px; }
+    .controls { margin-bottom: 1rem; }
   </style>
 </head>
 <body>
@@ -56,7 +39,7 @@
 
   <h2>Cleaned Output:</h2>
   <textarea id="output" readonly></textarea>
-  <button onclick="copyToClipboard()">Copy to Clipboard</button>
+  <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
 
   <script>
     document.getElementById("input").addEventListener("input", function () {
@@ -85,21 +68,19 @@
       const toTag = document.getElementById("toTag").value;
 
       if (!fromTag || !toTag) {
-        alert("Please select both tags.");
+        alert("Please select both tags");
         return;
       }
 
       const container = document.createElement("div");
       container.innerHTML = inputHTML;
 
-      // Replace selected tag
       container.querySelectorAll(fromTag).forEach(el => {
         const newEl = document.createElement(toTag);
         newEl.innerHTML = el.innerHTML;
         el.replaceWith(newEl);
       });
 
-      // Remove all divs and keep content
       container.querySelectorAll("div").forEach(div => {
         const parent = div.parentNode;
         while (div.firstChild) {
@@ -108,47 +89,20 @@
         parent.removeChild(div);
       });
 
-      // Remove all class, id, and style attributes
       container.querySelectorAll("*").forEach(el => {
         el.removeAttribute("class");
         el.removeAttribute("id");
         el.removeAttribute("style");
       });
 
-      // Auto-wrap loose text nodes in <p> tags
-      autoWrapTextInParagraphs(container);
-
-      // Format cleaned HTML
       const cleanedHTML = formatHTML(container.innerHTML.trim());
       document.getElementById("output").value = cleanedHTML;
     }
 
-    function autoWrapTextInParagraphs(container) {
-      const blockTags = new Set([
-        'P', 'DIV', 'UL', 'OL', 'LI', 'SECTION', 'ARTICLE', 'HEADER',
-        'FOOTER', 'NAV', 'MAIN', 'ASIDE', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'
-      ]);
-
-      [...container.childNodes].forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          const text = node.textContent.trim();
-          if (text.length > 0) {
-            const p = document.createElement("p");
-            p.textContent = text;
-            container.replaceChild(p, node);
-          } else {
-            container.removeChild(node);
-          }
-        } else if (node.nodeType === Node.ELEMENT_NODE && !blockTags.has(node.tagName)) {
-          autoWrapTextInParagraphs(node);
-        }
-      });
-    }
-
     function formatHTML(html) {
       const lines = html
-        .replace(/>\s+</g, '>\n<')  // line breaks between tags
-        .replace(/\n\s*\n/g, '\n')  // remove blank lines
+        .replace(/>\s+</g, '>\n<')
+        .replace(/\n\s*\n/g, '\n')
         .split('\n');
 
       let formatted = '';
@@ -157,6 +111,7 @@
 
       lines.forEach(line => {
         const trimmed = line.trim();
+
         if (trimmed.match(/^<\/\w/)) indent--;
         formatted += indentChar.repeat(indent) + trimmed + '\n';
         if (trimmed.match(/^<\w[^>]*[^/]>/) && !trimmed.includes('</')) indent++;
@@ -169,7 +124,8 @@
       const output = document.getElementById("output");
       output.select();
       document.execCommand("copy");
-      alert("Cleaned HTML copied to clipboard.");
+
+      alert("✅ Cleaned HTML copied to clipboard!");
     }
   </script>
 </body>
